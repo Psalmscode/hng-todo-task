@@ -210,7 +210,7 @@ ul[data-testid="test-todo-tags"] li {
 
 /* Action Buttons */
 .actions {
-  display: flex;
+  display: flexbox;
   gap: 8px;
   justify-content: flex-end;
   border-top: 0.5px solid #e2e2de;
