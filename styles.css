@@ -1,6 +1,6 @@
-/* ════════════════════════════════════════
+/*
    RESET & BASE
-════════════════════════════════════════ */
+*/
 *,
 *::before,
 *::after {
@@ -21,9 +21,9 @@ body {
   padding: 2rem 1rem;
 }
 
-/* ════════════════════════════════════════
+/*
    ACCESSIBILITY UTILITIES
-════════════════════════════════════════ */
+*/
 .sr-only {
   position: absolute;
   width: 1px;
@@ -40,17 +40,17 @@ body {
   display: none !important;
 }
 
-/* ════════════════════════════════════════
+/*
    PAGE WRAPPER
-════════════════════════════════════════ */
+*/
 .page-wrapper {
   width: 100%;
   max-width: 520px;
 }
 
-/* ════════════════════════════════════════
+/*
    CARD
-════════════════════════════════════════ */
+*/
 article[data-testid="test-todo-card"] {
   background: #ffffff;
   border: 1px solid #e2e0db;
@@ -76,9 +76,9 @@ article[data-testid="test-todo-card"].done {
   padding: 1.25rem 1.25rem 1.25rem 1.5rem;
 }
 
-/* ════════════════════════════════════════
+/*
    PRIORITY INDICATOR (left accent bar)
-════════════════════════════════════════ */
+*/
 [data-testid="test-todo-priority-indicator"] {
   position: absolute;
   top: 0;
@@ -93,9 +93,9 @@ article[data-testid="test-todo-card"].done {
 .priority-medium[data-testid="test-todo-priority-indicator"] { background: #e07c28; }
 .priority-low   [data-testid="test-todo-priority-indicator"] { background: #44a15e; }
 
-/* ════════════════════════════════════════
+/*
    TOP ROW: CHECKBOX + TITLE
-════════════════════════════════════════ */
+*/
 .card-top {
   display: flex;
   align-items: flex-start;
@@ -140,9 +140,9 @@ h2[data-testid="test-todo-title"].strikethrough {
   color: #9a9892;
 }
 
-/* ════════════════════════════════════════
+/*
    META ROW: BADGE + STATUS CONTROL
-════════════════════════════════════════ */
+*/
 .meta-row {
   display: flex;
   flex-wrap: wrap;
@@ -192,9 +192,9 @@ select[data-testid="test-todo-status-control"].status-pending    { background-co
 select[data-testid="test-todo-status-control"].status-inprogress { background-color: #eeedfe; color: #3c3489; border-color: #c4c0f8; }
 select[data-testid="test-todo-status-control"].status-done       { background-color: #eaf3de; color: #27500a; border-color: #a8d48a; }
 
-/* ════════════════════════════════════════
+/*
    DATE & TIME REMAINING
-════════════════════════════════════════ */
+*/
 .date-area {
   display: flex;
   flex-direction: column;
@@ -232,9 +232,9 @@ span[data-testid="test-todo-time-remaining"].time-done    { color: #44a15e; }
   width: fit-content;
 }
 
-/* ════════════════════════════════════════
+/*
    DESCRIPTION + EXPAND/COLLAPSE
-════════════════════════════════════════ */
+*/
 .description-wrapper {
   margin-bottom: 14px;
 }
@@ -282,9 +282,9 @@ span[data-testid="test-todo-time-remaining"].time-done    { color: #44a15e; }
 
 .expand-toggle:hover { color: #3c3489; }
 
-/* ════════════════════════════════════════
+/*
    TAGS
-════════════════════════════════════════ */
+*/
 ul[data-testid="test-todo-tags"] {
   display: flex;
   flex-wrap: wrap;
@@ -302,9 +302,9 @@ ul[data-testid="test-todo-tags"] li {
   color: #5f5e5a;
 }
 
-/* ════════════════════════════════════════
+/*
    ACTION BUTTONS
-════════════════════════════════════════ */
+*/
 .actions {
   display: flex;
   gap: 8px;
@@ -342,9 +342,9 @@ button[data-testid="test-todo-delete-button"] {
 
 button[data-testid="test-todo-delete-button"]:hover { background: #fcebeb; }
 
-/* ════════════════════════════════════════
+/*
    EDIT FORM
-════════════════════════════════════════ */
+*/
 #edit-mode {
   border-top: none;
 }
@@ -414,9 +414,9 @@ button[data-testid="test-todo-delete-button"]:hover { background: #fcebeb; }
 
 .btn-primary:hover { background: #3c3489; border-color: #3c3489; color: #fff; }
 
-/* ════════════════════════════════════════
+/*
    RESPONSIVE
-════════════════════════════════════════ */
+*/
 @media (max-width: 480px) {
   body { padding: 0.75rem; }
 
