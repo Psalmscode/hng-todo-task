@@ -1,96 +1,298 @@
-/* Todo Card — script.js */
+/* 
+   
+   TODO CARD — script.js  (Stage 1) 
+  
+*/
 
-const DUE_DATE = new Date("2026-04-17T18:00:00Z");
+/* Initial State */
+const state = {
+  title:       "Design system audit & component documentation",
+  description: "Review all UI components for accessibility compliance, update the Figma token library, and write comprehensive documentation for each pattern with real-world usage examples. This also includes running automated accessibility audits and fixing any WCAG AA violations found across the component library.",
+  priority:    "High",
+  status:      "In Progress",
+  dueDate:     new Date("2026-04-17T18:00:00Z"),
+  done:        false,
+};
 
-/**
- * Calculate a human-friendly time-remaining string
- * relative to DUE_DATE and the current time.
- * @returns {{ text: string, cls: string }}
- */
-function getTimeRemaining() {
-  const diff = DUE_DATE - Date.now();
+/* Snapshot used for cancel */
+let editSnapshot = null;
+
+/* Element References */
+const card             = document.getElementById("card");
+const viewMode         = document.getElementById("view-mode");
+const editMode         = document.getElementById("edit-mode");
+
+const taskTitle        = document.getElementById("task-title");
+const taskDescription  = document.getElementById("task-description");
+const priorityBadge    = document.getElementById("priority-badge");
+const priorityIndicator= document.getElementById("priority-indicator");
+
+const checkbox         = document.getElementById("complete-toggle");
+const statusControl    = document.getElementById("status-control");
+
+const dueDateDisplay   = document.getElementById("due-date-display");
+const timeRemaining    = document.getElementById("time-remaining");
+const overdueIndicator = document.getElementById("overdue-indicator");
+
+const collapsibleSection = document.getElementById("collapsible-section");
+const expandToggle       = document.getElementById("expand-toggle");
+
+const editBtn          = document.getElementById("edit-btn");
+const deleteBtn        = document.getElementById("delete-btn");
+const saveBtn          = document.getElementById("save-btn");
+const cancelBtn        = document.getElementById("cancel-btn");
+
+const editTitleInput   = document.getElementById("edit-title-input");
+const editDescInput    = document.getElementById("edit-description-input");
+const editPrioritySelect = document.getElementById("edit-priority-select");
+const editDueDateInput = document.getElementById("edit-due-date-input");
+
+/*
+   RENDER — sync DOM to state
+*/
+function render() {
+  /* Title */
+  taskTitle.textContent = state.title;
+  taskTitle.classList.toggle("strikethrough", state.done);
+
+  /* Description */
+  taskDescription.textContent = state.description;
+  checkExpandNeeded();
+
+  /* Priority badge */
+  const pLower = state.priority.toLowerCase();
+  priorityBadge.textContent = state.priority;
+  priorityBadge.className   = `badge badge-priority-${pLower}`;
+  priorityBadge.setAttribute("aria-label", `Priority: ${state.priority}`);
+
+  /* Priority indicator bar */
+  card.className = `priority-${pLower}`;
+  if (state.done) card.classList.add("done");
+
+  /* Status control */
+  statusControl.value = state.status;
+  applyStatusStyle();
+
+  /* Checkbox */
+  checkbox.checked = state.done;
+
+  /* Date display */
+  const dateStr = state.dueDate.toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric",
+  });
+  dueDateDisplay.textContent = `Due ${dateStr}`;
+  dueDateDisplay.setAttribute("datetime", state.dueDate.toISOString());
+
+  /* Time remaining */
+  updateTimeRemaining();
+}
+
+/*
+   PRIORITY INDICATOR + BADGE STYLE
+*/
+function applyStatusStyle() {
+  const map = {
+    "Pending":     "status-pending",
+    "In Progress": "status-inprogress",
+    "Done":        "status-done",
+  };
+  statusControl.className = map[state.status] || "";
+}
+
+/*
+   TIME REMAINING
+*/
+function updateTimeRemaining() {
+  if (state.done) {
+    timeRemaining.textContent = "Completed";
+    timeRemaining.className   = "time-done";
+    overdueIndicator.classList.add("hidden");
+    return;
+  }
+
+  const diff = state.dueDate - Date.now();
   const abs  = Math.abs(diff);
 
   const mins = Math.floor(abs / 60_000);
   const hrs  = Math.floor(abs / 3_600_000);
   const days = Math.floor(abs / 86_400_000);
 
+  let text, cls, isOverdue = false;
+
   if (diff < 0) {
-    if (mins < 60) return { text: `Overdue by ${mins} min${mins !== 1 ? "s" : ""}`, cls: "overdue" };
-    if (hrs  < 24) return { text: `Overdue by ${hrs} hour${hrs  !== 1 ? "s" : ""}`, cls: "overdue" };
-    return { text: `Overdue by ${days} day${days !== 1 ? "s" : ""}`, cls: "overdue" };
-  }
+    isOverdue = true;
+    if (mins < 60)  text = `Overdue by ${mins} min${mins !== 1 ? "s" : ""}`;
+    else if (hrs < 24) text = `Overdue by ${hrs} hour${hrs !== 1 ? "s" : ""}`;
+    else            text = `Overdue by ${days} day${days !== 1 ? "s" : ""}`;
+    cls = "time-overdue";
+  } else if (mins < 5)   { text = "Due now!";                                       cls = "time-overdue"; }
+  else if (mins < 60)    { text = `Due in ${mins} minute${mins !== 1 ? "s" : ""}`;  cls = "time-soon";    }
+  else if (hrs < 24)     { text = `Due in ${hrs} hour${hrs !== 1 ? "s" : ""}`;      cls = "time-soon";    }
+  else if (days === 1)   { text = "Due tomorrow";                                   cls = "time-soon";    }
+  else                   { text = `Due in ${days} day${days !== 1 ? "s" : ""}`;     cls = "";             }
 
-  if (mins < 5)  return { text: "Due now!",                                cls: "overdue" };
-  if (hrs  < 24) return { text: `Due in ${hrs} hour${hrs !== 1 ? "s" : ""}`, cls: "soon"    };
-  if (days === 1) return { text: "Due tomorrow",                            cls: "soon"    };
-
-  return { text: `Due in ${days} day${days !== 1 ? "s" : ""}`, cls: "" };
+  timeRemaining.textContent = text;
+  timeRemaining.className   = cls;
+  overdueIndicator.classList.toggle("hidden", !isOverdue);
 }
 
-/**
- * Update the time-remaining element in the DOM.
- */
-function updateTimeRemaining() {
-  const el = document.getElementById("time-remaining");
-  if (!el) return;
+/*
+   EXPAND / COLLAPSE
+*/
+const COLLAPSE_THRESHOLD = 120; // chars
 
-  const { text, cls } = getTimeRemaining();
-  el.textContent = text;
-  el.className   = cls;
-}
-
-/**
- * Handle checkbox toggle — visually marks the card as done
- * or reverts it back to in-progress.
- * @param {HTMLInputElement} checkbox
- */
-function handleToggle(checkbox) {
-  const card   = document.getElementById("card");
-  const title  = document.getElementById("task-title");
-  const status = document.getElementById("status-badge");
-
-  if (checkbox.checked) {
-    card.classList.add("done");
-    title.classList.add("strikethrough");
-
-    status.textContent = "Done";
-    status.className   = "badge badge-status-done";
-    status.setAttribute("aria-label", "Status: Done");
+function checkExpandNeeded() {
+  if (state.description.length > COLLAPSE_THRESHOLD) {
+    expandToggle.classList.remove("hidden");
+    /* Keep whatever expanded state it is currently in */
   } else {
-    card.classList.remove("done");
-    title.classList.remove("strikethrough");
-
-    status.textContent = "In Progress";
-    status.className   = "badge badge-status-progress";
-    status.setAttribute("aria-label", "Status: In Progress");
+    /* Short description — always show fully, hide toggle */
+    collapsibleSection.classList.remove("collapsed");
+    collapsibleSection.classList.add("expanded");
+    expandToggle.classList.add("hidden");
   }
 }
 
-/* Initialise */
+expandToggle.addEventListener("click", () => {
+  const isExpanded = collapsibleSection.classList.contains("expanded");
+  collapsibleSection.classList.toggle("collapsed", isExpanded);
+  collapsibleSection.classList.toggle("expanded", !isExpanded);
+  expandToggle.setAttribute("aria-expanded", String(!isExpanded));
+  expandToggle.textContent = isExpanded ? "Show more" : "Show less";
+});
 
-// Run time-remaining calculation immediately, then refresh every 60 s
-updateTimeRemaining();
-setInterval(updateTimeRemaining, 60_000);
+/*
+   CHECKBOX TOGGLE
+*/
+checkbox.addEventListener("change", () => {
+  state.done   = checkbox.checked;
+  state.status = checkbox.checked ? "Done" : "Pending";
+  render();
+});
 
-// Wire up checkbox
-const checkbox = document.getElementById("complete-toggle");
-if (checkbox) {
-  checkbox.addEventListener("change", () => handleToggle(checkbox));
+/*
+   STATUS CONTROL
+*/
+statusControl.addEventListener("change", () => {
+  state.status = statusControl.value;
+  state.done   = state.status === "Done";
+  render();
+});
+
+/*
+   EDIT MODE
+*/
+function openEditMode() {
+  /* Snapshot current state for cancel */
+  editSnapshot = { ...state, dueDate: new Date(state.dueDate) };
+
+  /* Populate form */
+  editTitleInput.value       = state.title;
+  editDescInput.value        = state.description;
+  editPrioritySelect.value   = state.priority;
+  editDueDateInput.value     = toDateInputValue(state.dueDate);
+
+  /* Swap views */
+  viewMode.classList.add("hidden");
+  editMode.classList.remove("hidden");
+
+  /* Move focus into form */
+  editTitleInput.focus();
 }
 
-// Edit button
-const editBtn = document.getElementById("edit-btn");
-if (editBtn) {
-  editBtn.addEventListener("click", () => {
-    console.log("edit clicked");
-  });
+function closeEditMode(restoreSnapshot = false) {
+  if (restoreSnapshot && editSnapshot) {
+    Object.assign(state, editSnapshot);
+  }
+  editSnapshot = null;
+
+  viewMode.classList.remove("hidden");
+  editMode.classList.add("hidden");
+
+  /* Return focus to Edit button */
+  editBtn.focus();
+
+  render();
 }
 
-// Delete button
-const deleteBtn = document.getElementById("delete-btn");
-if (deleteBtn) {
-  deleteBtn.addEventListener("click", () => {
-    alert("Delete task?");
-  });
+editBtn.addEventListener("click", openEditMode);
+
+saveBtn.addEventListener("click", () => {
+  const newTitle = editTitleInput.value.trim();
+  if (!newTitle) {
+    editTitleInput.focus();
+    editTitleInput.setCustomValidity("Title is required");
+    editTitleInput.reportValidity();
+    return;
+  }
+  editTitleInput.setCustomValidity("");
+
+  state.title       = newTitle;
+  state.description = editDescInput.value.trim();
+  state.priority    = editPrioritySelect.value;
+
+  const parsedDate = new Date(editDueDateInput.value);
+  if (!isNaN(parsedDate)) {
+    /* Set time to end of day */
+    parsedDate.setUTCHours(18, 0, 0, 0);
+    state.dueDate = parsedDate;
+  }
+
+  closeEditMode(false);
+});
+
+cancelBtn.addEventListener("click", () => closeEditMode(true));
+
+/* Trap focus inside edit form (simple: cycle between first and last focusable) */
+editMode.addEventListener("keydown", (e) => {
+  if (e.key !== "Tab") return;
+  const focusable = Array.from(
+    editMode.querySelectorAll("input, textarea, select, button")
+  ).filter(el => !el.disabled && !el.closest(".hidden"));
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last  = focusable[focusable.length - 1];
+  if (e.shiftKey && document.activeElement === first) {
+    e.preventDefault();
+    last.focus();
+  } else if (!e.shiftKey && document.activeElement === last) {
+    e.preventDefault();
+    first.focus();
+  }
+});
+
+/* Close edit mode on Escape */
+editMode.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeEditMode(true);
+});
+
+/*
+   DELETE BUTTON
+*/
+deleteBtn.addEventListener("click", () => {
+  if (confirm("Delete this task?")) {
+    card.remove();
+  }
+});
+
+/*
+   HELPERS
+*/
+function toDateInputValue(date) {
+  const y = date.getUTCFullYear();
+  const m = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(date.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
+
+/*
+   INIT
+*/
+render();
+
+/* Default collapsed if long description */
+collapsibleSection.classList.add("collapsed");
+expandToggle.setAttribute("aria-expanded", "false");
+
+/* Auto-refresh time every 30 seconds */
+setInterval(updateTimeRemaining, 30_000);

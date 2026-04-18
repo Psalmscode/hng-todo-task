@@ -1,4 +1,6 @@
-/* Reset & Base */
+/* ════════════════════════════════════════
+   RESET & BASE
+════════════════════════════════════════ */
 *,
 *::before,
 *::after {
@@ -10,7 +12,7 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  background-color: #f5f5f3;
+  background-color: #f4f2ef;
   color: #1a1a1a;
   min-height: 100vh;
   display: flex;
@@ -19,7 +21,9 @@ body {
   padding: 2rem 1rem;
 }
 
-/* Accessibility */
+/* ════════════════════════════════════════
+   ACCESSIBILITY UTILITIES
+════════════════════════════════════════ */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -32,32 +36,66 @@ body {
   border: 0;
 }
 
-/* Page Wrapper */
+.hidden {
+  display: none !important;
+}
+
+/* ════════════════════════════════════════
+   PAGE WRAPPER
+════════════════════════════════════════ */
 .page-wrapper {
   width: 100%;
   max-width: 520px;
 }
 
-/* Card */
+/* ════════════════════════════════════════
+   CARD
+════════════════════════════════════════ */
 article[data-testid="test-todo-card"] {
   background: #ffffff;
-  border: 1px solid #e2e2de;
-  border-radius: 12px;
-  padding: 1.25rem;
+  border: 1px solid #e2e0db;
+  border-radius: 14px;
+  padding: 0;
   width: 100%;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+  position: relative;
 }
 
 article[data-testid="test-todo-card"]:focus-within {
-  border-color: #534ab7;
-  box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.1);
+  box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.12);
 }
 
 article[data-testid="test-todo-card"].done {
   opacity: 0.72;
 }
 
-/* Card Top Row */
+/* ── Inner padding wrapper ── */
+#view-mode,
+#edit-mode {
+  padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+}
+
+/* ════════════════════════════════════════
+   PRIORITY INDICATOR (left accent bar)
+════════════════════════════════════════ */
+[data-testid="test-todo-priority-indicator"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  border-radius: 14px 0 0 14px;
+  transition: background-color 0.2s;
+}
+
+.priority-high  [data-testid="test-todo-priority-indicator"] { background: #d44333; }
+.priority-medium[data-testid="test-todo-priority-indicator"] { background: #e07c28; }
+.priority-low   [data-testid="test-todo-priority-indicator"] { background: #44a15e; }
+
+/* ════════════════════════════════════════
+   TOP ROW: CHECKBOX + TITLE
+════════════════════════════════════════ */
 .card-top {
   display: flex;
   align-items: flex-start;
@@ -86,33 +124,25 @@ input[type="checkbox"]:focus {
   border-radius: 2px;
 }
 
-/* Title & Description */
-.title-area {
-  flex: 1;
-  min-width: 0;
-}
+.title-area { flex: 1; min-width: 0; }
 
 h2[data-testid="test-todo-title"] {
   font-size: 16px;
   font-weight: 500;
   color: #1a1a1a;
   line-height: 1.4;
+  word-break: break-word;
   transition: text-decoration 0.1s, color 0.1s;
 }
 
 h2[data-testid="test-todo-title"].strikethrough {
   text-decoration: line-through;
-  color: #888780;
+  color: #9a9892;
 }
 
-p[data-testid="test-todo-description"] {
-  font-size: 13px;
-  color: #5f5e5a;
-  margin-top: 4px;
-  line-height: 1.6;
-}
-
-/* Meta Row: Priority & Status */
+/* ════════════════════════════════════════
+   META ROW: BADGE + STATUS CONTROL
+════════════════════════════════════════ */
 .meta-row {
   display: flex;
   flex-wrap: wrap;
@@ -121,6 +151,7 @@ p[data-testid="test-todo-description"] {
   margin-bottom: 14px;
 }
 
+/* Priority badge */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -129,41 +160,41 @@ p[data-testid="test-todo-description"] {
   padding: 3px 10px;
   border-radius: 999px;
   line-height: 1.4;
+  white-space: nowrap;
 }
 
-/* Priority variants */
-.badge-priority-high {
-  background: #faece7;
-  color: #712b13;
+.badge-priority-high   { background: #faece7; color: #712b13; }
+.badge-priority-medium { background: #faeeda; color: #633806; }
+.badge-priority-low    { background: #eaf3de; color: #27500a; }
+
+/* Status dropdown */
+select[data-testid="test-todo-status-control"] {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 3px 24px 3px 10px;
+  border-radius: 999px;
+  border: 1px solid #c8c7c0;
+  background: #f4f2ef url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235f5e5a'/%3E%3C/svg%3E") no-repeat right 8px center;
+  background-size: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  color: #1a1a1a;
+  font-family: inherit;
 }
 
-.badge-priority-medium {
-  background: #faeeda;
-  color: #633806;
+select[data-testid="test-todo-status-control"]:focus {
+  outline: 2px solid #534ab7;
+  outline-offset: 2px;
 }
 
-.badge-priority-low {
-  background: #eaf3de;
-  color: #27500a;
-}
+select[data-testid="test-todo-status-control"].status-pending    { background-color: #e6f1fb; color: #0c447c; border-color: #b3d0ef; }
+select[data-testid="test-todo-status-control"].status-inprogress { background-color: #eeedfe; color: #3c3489; border-color: #c4c0f8; }
+select[data-testid="test-todo-status-control"].status-done       { background-color: #eaf3de; color: #27500a; border-color: #a8d48a; }
 
-/* Status variants */
-.badge-status-pending {
-  background: #e6f1fb;
-  color: #0c447c;
-}
-
-.badge-status-progress {
-  background: #eeedfe;
-  color: #3c3489;
-}
-
-.badge-status-done {
-  background: #eaf3de;
-  color: #27500a;
-}
-
-/* Date & Time Remaining */
+/* ════════════════════════════════════════
+   DATE & TIME REMAINING
+════════════════════════════════════════ */
 .date-area {
   display: flex;
   flex-direction: column;
@@ -182,15 +213,78 @@ span[data-testid="test-todo-time-remaining"] {
   color: #1a1a1a;
 }
 
-span[data-testid="test-todo-time-remaining"].overdue {
+span[data-testid="test-todo-time-remaining"].time-overdue { color: #a32d2d; }
+span[data-testid="test-todo-time-remaining"].time-soon    { color: #854f0b; }
+span[data-testid="test-todo-time-remaining"].time-done    { color: #44a15e; }
+
+/* Overdue indicator badge */
+.overdue-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
   color: #a32d2d;
+  background: #faece7;
+  border: 1px solid #f5c0b0;
+  border-radius: 999px;
+  padding: 2px 10px;
+  width: fit-content;
 }
 
-span[data-testid="test-todo-time-remaining"].soon {
-  color: #854f0b;
+/* ════════════════════════════════════════
+   DESCRIPTION + EXPAND/COLLAPSE
+════════════════════════════════════════ */
+.description-wrapper {
+  margin-bottom: 14px;
 }
 
-/* Tags */
+.collapsible p[data-testid="test-todo-description"] {
+  font-size: 13px;
+  color: #5f5e5a;
+  line-height: 1.65;
+  word-break: break-word;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.collapsible.collapsed p[data-testid="test-todo-description"] {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.collapsible.expanded p[data-testid="test-todo-description"] {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+
+.expand-toggle {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #534ab7;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.expand-toggle:focus {
+  outline: 2px solid #534ab7;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.expand-toggle:hover { color: #3c3489; }
+
+/* ════════════════════════════════════════
+   TAGS
+════════════════════════════════════════ */
 ul[data-testid="test-todo-tags"] {
   display: flex;
   flex-wrap: wrap;
@@ -202,18 +296,20 @@ ul[data-testid="test-todo-tags"] {
 ul[data-testid="test-todo-tags"] li {
   font-size: 12px;
   padding: 3px 10px;
-  background: #f1efe8;
+  background: #f4f2ef;
   border: 0.5px solid #d3d1c7;
   border-radius: 999px;
   color: #5f5e5a;
 }
 
-/* Action Buttons */
+/* ════════════════════════════════════════
+   ACTION BUTTONS
+════════════════════════════════════════ */
 .actions {
-  display: flexbox;
+  display: flex;
   gap: 8px;
   justify-content: flex-end;
-  border-top: 0.5px solid #e2e2de;
+  border-top: 1px solid #e8e6e1;
   padding-top: 12px;
 }
 
@@ -230,42 +326,110 @@ button {
   transition: background 0.12s, color 0.12s, transform 0.08s;
 }
 
-button:hover {
-  background: #f1efe8;
-  color: #1a1a1a;
-}
+button:hover { background: #f4f2ef; color: #1a1a1a; }
 
 button:focus {
   outline: 2px solid #534ab7;
   outline-offset: 2px;
 }
 
-button:active {
-  transform: scale(0.98);
-}
+button:active { transform: scale(0.98); }
 
 button[data-testid="test-todo-delete-button"] {
   color: #a32d2d;
   border-color: #f7c1c1;
 }
 
-button[data-testid="test-todo-delete-button"]:hover {
-  background: #fcebeb;
+button[data-testid="test-todo-delete-button"]:hover { background: #fcebeb; }
+
+/* ════════════════════════════════════════
+   EDIT FORM
+════════════════════════════════════════ */
+#edit-mode {
+  border-top: none;
 }
 
-/* Responsive */
+#edit-form { display: flex; flex-direction: column; gap: 14px; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #5f5e5a;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select,
+.form-group input[type="date"] {
+  font-size: 14px;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: #f9f8f5;
+  border: 1px solid #d3d1c7;
+  border-radius: 8px;
+  padding: 8px 10px;
+  width: 100%;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-group textarea { resize: vertical; min-height: 90px; }
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #534ab7;
+  box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.1);
+}
+
+/* Priority + due date side by side on wider screens */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding-top: 4px;
+  border-top: 1px solid #e8e6e1;
+}
+
+.btn-primary {
+  background: #534ab7;
+  color: #ffffff;
+  border-color: #534ab7;
+  font-weight: 500;
+}
+
+.btn-primary:hover { background: #3c3489; border-color: #3c3489; color: #fff; }
+
+/* ════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════ */
 @media (max-width: 480px) {
-  body {
-    padding: 1rem 0.75rem;
-    align-items: flex-start;
-  }
+  body { padding: 0.75rem; }
 
-  article[data-testid="test-todo-card"] {
-    padding: 1rem;
-    border-radius: 10px;
-  }
+  #view-mode,
+  #edit-mode { padding: 1rem 1rem 1rem 1.35rem; }
 
-  h2[data-testid="test-todo-title"] {
-    font-size: 15px;
-  }
+  h2[data-testid="test-todo-title"] { font-size: 15px; }
+
+  .form-row { grid-template-columns: 1fr; }
+
+  .meta-row { gap: 6px; }
+}
+
+@media (min-width: 768px) {
+  .page-wrapper { max-width: 520px; }
 }
